@@ -1,100 +1,90 @@
-import Checkbox from '@/Components/Checkbox';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import React, { useState } from "react";
+import { router } from "@inertiajs/react";
+import { initializeApp } from "firebase/app";
+import {
+    getAuth,
+    RecaptchaVerifier,
+    signInWithPhoneNumber,
+} from "firebase/auth";
 
-export default function Login({ status, canResetPassword }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
-        remember: false,
-    });
+// Firebase Config
+const firebaseConfig = {
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+};
 
-    const submit = (e) => {
-        e.preventDefault();
+// Init Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-        post(route('login'), {
-            onFinish: () => reset('password'),
-        });
+export default function PhoneLogin() {
+    const [phone, setPhone] = useState("");
+    const [otp, setOtp] = useState("");
+    const [confirmationResult, setConfirmationResult] = useState(null);
+
+    const setupRecaptcha = () => {
+        window.recaptchaVerifier = new RecaptchaVerifier(
+            auth,
+            "recaptcha-container",
+            {
+                size: "invisible", // or "normal"
+            }
+        );
+    };
+
+    const sendOTP = async () => {
+        setupRecaptcha();
+        try {
+            const result = await signInWithPhoneNumber(
+                auth,
+                phone,
+                window.recaptchaVerifier
+            );
+            setConfirmationResult(result);
+            alert("OTP sent!");
+        } catch (error) {
+            console.error(error);
+            alert(error.message);
+        }
+    };
+
+    const verifyOTP = async () => {
+        try {
+            const userCredential = await confirmationResult.confirm(otp);
+            const idToken = await userCredential.user.getIdToken();
+            router.post("/firebase-login", { token: idToken }); // Send to Laravel
+        } catch (error) {
+            console.error(error);
+            alert("Invalid OTP");
+        }
     };
 
     return (
-        <GuestLayout>
-            <Head title="Log in" />
+        <div>
+            <h2>Login with Phone</h2>
+            <input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+91 98765 43210"
+            />
+            <div id="recaptcha-container"></div>
+            <button onClick={sendOTP}>Send OTP</button>
 
-            {status && (
-                <div className="mb-4 text-sm font-medium text-green-600">
-                    {status}
-                </div>
+            {confirmationResult && (
+                <>
+                    <input
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        placeholder="Enter OTP"
+                    />
+                    <button onClick={verifyOTP}>Verify OTP</button>
+                </>
             )}
-
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        isFocused={true}
-                        onChange={(e) => setData('email', e.target.value)}
-                    />
-
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4 block">
-                    <label className="flex items-center">
-                        <Checkbox
-                            name="remember"
-                            checked={data.remember}
-                            onChange={(e) =>
-                                setData('remember', e.target.checked)
-                            }
-                        />
-                        <span className="ms-2 text-sm text-gray-600">
-                            Remember me
-                        </span>
-                    </label>
-                </div>
-
-                <div className="mt-4 flex items-center justify-end">
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
-                            Forgot your password?
-                        </Link>
-                    )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
-                </div>
-            </form>
-        </GuestLayout>
+        </div>
     );
 }
