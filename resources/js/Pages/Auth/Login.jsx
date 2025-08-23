@@ -53,11 +53,41 @@ export default function PhoneLogin() {
         }
     };
 
+    // const verifyOTP = async () => {
+    //     try {
+    //         const userCredential = await confirmationResult.confirm(otp);
+    //         const idToken = await userCredential.user.getIdToken();
+    //         const res = await axios.post(
+    //             "http://localhost:8000/firebase-login",
+    //             { token },
+    //             { withCredentials: true } // important for Laravel session cookies
+    //         );
+    //         console.log("Logged in:", res.data.user);
+    //         return res.data.user;
+    //     } catch (error) {
+    //         console.error(error);
+    //         alert("Invalid OTP");
+    //     }
+    // };
+
     const verifyOTP = async () => {
         try {
+            // Verify OTP with Firebase
             const userCredential = await confirmationResult.confirm(otp);
+
+            // Get Firebase ID token
             const idToken = await userCredential.user.getIdToken();
-            router.post("/firebase-login", { token: idToken }); // Send to Laravel
+
+            // Send token to Laravel backend for session login
+            const res = await axios.post(
+                "http://localhost:8000/firebase-login",
+                { token: idToken }, // ✅ use idToken here
+                { withCredentials: true } // needed for Laravel session cookies
+            );
+
+            console.log("Logged in:", res.data.user);
+            window.location.href = "/dashboard";
+            return res.data.user;
         } catch (error) {
             console.error(error);
             alert("Invalid OTP");

@@ -23,6 +23,7 @@
         "vite": "^7.0.4"
     },
     "dependencies": {
+        "@react-google-maps/api": "^2.20.7",
         "firebase": "^12.1.0"
     }
 }

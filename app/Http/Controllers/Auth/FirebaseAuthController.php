@@ -9,6 +9,32 @@ use Kreait\Firebase\Factory;
 
 class FirebaseAuthController extends Controller
 {
+    // public function login(Request $request)
+    // {
+    //     $request->validate(['token' => 'required']);
+
+    //     $firebase = (new Factory)
+    //         ->withServiceAccount(storage_path('app/credentials/firebase-credentials.json'))
+    //         ->createAuth();
+
+    //     try {
+    //         $verifiedIdToken = $firebase->verifyIdToken($request->token);
+    //         $phoneNumber = $verifiedIdToken->claims()->get('phone_number');
+
+    //         $user = User::firstOrCreate(
+    //             ['phone' => $phoneNumber],
+    //             ['name' => 'User ' . $phoneNumber],
+    //             ['phone_verified_at' => now()]
+    //         );
+
+    //         auth()->login($user);
+
+    //         return redirect()->route('dashboard');
+    //     } catch (\Exception $e) {
+    //         return back()->withErrors(['error' => 'Invalid token']);
+    //     }
+    // }
+
     public function login(Request $request)
     {
         $request->validate(['token' => 'required']);
@@ -21,17 +47,28 @@ class FirebaseAuthController extends Controller
             $verifiedIdToken = $firebase->verifyIdToken($request->token);
             $phoneNumber = $verifiedIdToken->claims()->get('phone_number');
 
+            // Create/find user
             $user = User::firstOrCreate(
                 ['phone' => $phoneNumber],
-                ['name' => 'User ' . $phoneNumber],
-                ['phone_verified_at' => now()]
+                [
+                    'name' => 'User ' . $phoneNumber,
+                    'phone_verified_at' => now()
+                ]
             );
 
+            // Log the user in (creates session)
             auth()->login($user);
 
-            return redirect()->route('dashboard');
+            // Return JSON so frontend can know login success
+            return response()->json([
+                'message' => 'Login successful',
+                'user' => $user
+            ]);
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Invalid token']);
+            return response()->json([
+                'error' => 'Invalid token',
+                'details' => $e->getMessage(),
+            ], 401);
         }
     }
 }
