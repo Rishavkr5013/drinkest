@@ -13,8 +13,5 @@ class Store extends Model
         'delivery_radius',
     ];
 
-    // Ensure location is cast to array (lat, lng)
-    protected $casts = [
-        'location' => 'array',
-    ];
+    // Don't cast location - it's a PostGIS geography column handled by raw SQL
 }

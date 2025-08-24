@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Http\Controllers;
+
 use App\Models\UserLocation;
 use App\Services\GeoService;
 use Illuminate\Http\Request;

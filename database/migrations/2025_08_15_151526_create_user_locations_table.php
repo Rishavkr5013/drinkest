@@ -14,7 +14,11 @@ return new class extends Migration
         Schema::create('user_locations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('address');
+            $table->string('address'); // Keep for backward compatibility
+            $table->string('house_name_or_number')->nullable();
+            $table->string('road_name')->nullable();
+            $table->string('landmark')->nullable();
+            $table->string('address_type')->nullable(); // e.g., 'Home', 'Work', 'Other'
             $table->timestamps();
         });
 

@@ -17,19 +17,4 @@ class AdminController extends Controller
     {
         return Inertia::render('Admin/Dashboard/Index');
     }
-
-    public function store()
-    {
-        return Inertia::render('Admin/Store/Index');
-    }
-
-    public function users()
-    {
-        return Inertia::render('Admin/Users/Index');
-    }
-
-    public function orders()
-    {
-        return Inertia::render('Admin/Order/Index');
-    }
 }

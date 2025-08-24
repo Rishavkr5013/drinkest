@@ -8,6 +8,7 @@ use App\Models\Store;
 use App\Models\UserLocation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class OrderController extends Controller
 {
@@ -71,6 +72,8 @@ class OrderController extends Controller
     //     ]);
     // }
 
+
+
     public function store(Request $request)
     {
         // $request->validate([
@@ -104,7 +107,6 @@ class OrderController extends Controller
         // }
 
 
-        \Log::info("this is at line 107=======> " . json_encode($request->all()));
         // Create order
         $order = Order::create([
             'user_id' => auth()->id() ?? 1,

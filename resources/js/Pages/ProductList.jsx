@@ -49,7 +49,7 @@ export default function ProductList({ storeId }) {
                 "/api/orders",
                 {
                     store_id: 2,
-                    user_location_id: 6,
+                    user_location_id: 1,
                     items: cart.map((item) => ({
                         product_id: item.product.id,
                         quantity: item.quantity,
