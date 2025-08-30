@@ -102,6 +102,26 @@ export default function AdminSidebar({ isOpen, className = "" }) {
             ),
             emoji: "🛒",
         },
+        {
+            name: "Delivery Partners",
+            href: route("admin.delivery-partners.index"),
+            icon: (
+                <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M19 7v4a2 2 0 0 1 -2 2h-2m-2 -2v-4a2 2 0 0 1 2 -2h2m4 8v4h-4v-4M3 18v4h4v-4"
+                    />
+                </svg>
+            ),
+            emoji: "🏍️",
+        },
     ];
 
     return (

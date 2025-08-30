@@ -163,7 +163,7 @@ export default function Dashboard({ storeId }) {
         try {
             const res = await axios.post("/api/user-location/check-radius", {
                 address,
-                store_id: 2,
+                store_id: 1,
                 latitude: lat,
                 longitude: lng,
             });

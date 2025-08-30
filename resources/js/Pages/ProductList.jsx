@@ -48,7 +48,7 @@ export default function ProductList({ storeId }) {
             const res = await axios.post(
                 "/api/orders",
                 {
-                    store_id: 2,
+                    store_id: 1,
                     user_location_id: 1,
                     items: cart.map((item) => ({
                         product_id: item.product.id,

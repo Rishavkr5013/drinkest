@@ -1,11 +1,14 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\DeliveryPartnerController as AdminDeliveryPartnerController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\StoreController as AdminStoreController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Auth\FirebaseAuthController;
+use App\Http\Controllers\DeliveryPartnerAuthController;
+use App\Http\Controllers\DeliveryPartnerController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -76,6 +79,18 @@ Route::prefix('admin')->group(function () {
     // Order management routes
     Route::get('/orders', [OrderController::class, 'index'])->name('admin.orders.index');
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
+    Route::post('/orders/{order}/assign', [OrderController::class, 'assignDeliveryPartner'])->name('admin.orders.assign');
+    Route::delete('/orders/{order}/unassign', [OrderController::class, 'unassignDeliveryPartner'])->name('admin.orders.unassign');
+
+    // Delivery Partner management routes
+    Route::get('/delivery-partners', [AdminDeliveryPartnerController::class, 'index'])->name('admin.delivery-partners.index');
+    Route::get('/delivery-partners/create', [AdminDeliveryPartnerController::class, 'create'])->name('admin.delivery-partners.create');
+    Route::post('/delivery-partners', [AdminDeliveryPartnerController::class, 'store'])->name('admin.delivery-partners.store');
+    Route::get('/delivery-partners/{deliveryPartner}', [AdminDeliveryPartnerController::class, 'show'])->name('admin.delivery-partners.show');
+    Route::get('/delivery-partners/{deliveryPartner}/edit', [AdminDeliveryPartnerController::class, 'edit'])->name('admin.delivery-partners.edit');
+    Route::patch('/delivery-partners/{deliveryPartner}', [AdminDeliveryPartnerController::class, 'update'])->name('admin.delivery-partners.update');
+    Route::post('/delivery-partners/{deliveryPartner}/toggle-online', [AdminDeliveryPartnerController::class, 'toggleOnlineStatus'])->name('admin.delivery-partners.toggle-online');
+    Route::delete('/delivery-partners/{deliveryPartner}', [AdminDeliveryPartnerController::class, 'destroy'])->name('admin.delivery-partners.destroy');
 });
 
 
@@ -88,5 +103,17 @@ Route::middleware(['auth'])->group(function () {
         ]);
     })->name('store.products');
 });
+
+
+Route::get('/delivery-partner/login', [DeliveryPartnerAuthController::class, 'showLoginForm'])->name('delivery-partner.login');
+Route::post('/delivery-partner/login', [DeliveryPartnerAuthController::class, 'login']);
+Route::post('/delivery-partner/logout', [DeliveryPartnerAuthController::class, 'logout']);
+
+Route::middleware('auth:delivery_partner')->group(function () {
+    Route::get('/delivery-partner/dashboard', [DeliveryPartnerController::class, 'dashboard']);
+    Route::post('/delivery-partner/update-order-status', [DeliveryPartnerController::class, 'updateOrderStatus']);
+    Route::post('/delivery-partner/toggle-online', [DeliveryPartnerController::class, 'toggleOnlineStatus']);
+});
+
 
 require __DIR__ . '/auth.php';

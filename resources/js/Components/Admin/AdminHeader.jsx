@@ -28,7 +28,7 @@ export default function AdminHeader({ onMenuToggle }) {
                         />
                     </svg>
                 </button>
-                <h1 className="text-xl font-semibold">RapidNative Admin</h1>
+                <h1 className="text-xl font-semibold">Drinkest Admin</h1>
             </div>
 
             {/* Right side - User dropdown */}

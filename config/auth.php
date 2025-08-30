@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'delivery_partner' => [
+            'driver' => 'session',
+            'provider' => 'delivery_partners',
+        ],
     ],
 
     /*
@@ -69,6 +73,11 @@ return [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
+
+        'delivery_partners' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\DeliveryPartner::class,
+        ],
     ],
 
     /*
